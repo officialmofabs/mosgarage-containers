@@ -1,0 +1,10 @@
+{
+  "name": "Develop with database and mq",
+  "dockerComposeFile": "./docker-compose.yml",
+  "service": "devcontainer",
+  "runServices": ["mongodb"],
+  "forwardPorts": [3002, "mongodb:27001"]
+}
+
+
+

@@ -1,0 +1,62 @@
+   Script-server
+   Copyright 2016-2020 buggygm@gmail.com
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+
+# Copyright NOTICES
+
+web/favicon.ico
+web/images/console.png (modified)
+The file is a part of the Font Software Project and distributed under SIL Open Font License, Version 1.1 (https://github.com/Templarian/MaterialDesign/blob/master/license.txt)
+
+images/search.png (modified)
+images/clear.png (modified)
+https://material.io/icons/
+The icon is available under the Apache License Version 2.0
+
+MainAppSidebar.vue: svg.github-icon:
+The svg is copied from https://github.com/logos page
+
+images/titleBackground.jpg
+The image is from free set of material design backgrounds, published by oxygenna.com and absolutely free to use (Source: http://www.oxygenna.com/news/brand-new-set-of-40-material-design-backgrounds)
+
+images/titleBackground_small.jpg
+images/titleBackground_login.jpg
+Same as above, but the image sizes was changed for Script server project
+
+images/cookie.png (modified)
+https://github.com/whitebird/FontAwesome-cookie
+Licensed under http://creativecommons.org/publicdomain/zero/1.0
+
+images/file_download.png (modified)
+https://material.io/icons/#ic_file_download
+
+
+images/g-logo-plain.png (modified)
+https://developers.google.com/identity/branding-guidelines
+Licensed under the Creative Commons Attribution 3.0 License
+
+samples/themes/dark/darkBackground_header.jpg (modified)
+samples/themes/dark/darkBackground_login.jpg (modified)
+Copyright © 2018 onlyvectorbackgrounds.com
+The images are taken from https://onlyvectorbackgrounds.com/abstract-geometric-background-dark-3/ and modified for this project
+License:
+https://onlyvectorbackgrounds.com/terms/
+Extract:
+YOU CAN
+Use the images for personal use as they are, in part or remix to make other designs.
+Use the images for commercial use as they are, in part or remix to make other designs.
+YOU CANNOT
+Claim that the images are your property or were designed by you.
+Redistribute, sell, licence, sublicense or rent the images (e.g. selling on stock imagery sites).

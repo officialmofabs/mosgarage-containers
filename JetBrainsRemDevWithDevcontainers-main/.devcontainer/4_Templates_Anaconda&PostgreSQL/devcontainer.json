@@ -1,0 +1,4 @@
+{
+  "name": "Anaconda&Postgres",
+  "image": "mcr.microsoft.com/devcontainers/cpp:latest"
+}

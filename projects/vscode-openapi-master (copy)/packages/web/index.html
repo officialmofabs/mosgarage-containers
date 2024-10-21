@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scan UI</title>
+    <link rel="stylesheet" type="text/css" href="/scan-ui-sample/vscode-styles.css">
+    <link rel="stylesheet" type="text/css" href="/scan-ui-sample/xliic-vars.css">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/app/scanconf/index.tsx"></script>
+    <script>
+      window.addEventListener("DOMContentLoaded", async (event) => {
+        const oas = await (await fetch("/scan-ui-sample/oas.json")).json();
+        const scanconf = await(await fetch("/scan-ui-sample/scanconf.json")).text();
+
+        const host = { postMessage: (message) => console.log("received webapp message", message) };
+
+        window.renderWebView(host, { kind: "light" });
+
+        window.postMessage({
+          command: "changeTheme",
+          payload: {
+            kind: "light"
+          }
+        });
+
+        window.postMessage({
+          command: "showScanconfOperation",
+          payload: {
+            method: "get",
+            path: "/api/user/info",
+            oas,
+            scanconf
+          }
+        });        
+      });
+    </script>
+  </body>
+</html>

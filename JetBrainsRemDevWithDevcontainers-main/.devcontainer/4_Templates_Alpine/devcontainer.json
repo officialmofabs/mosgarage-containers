@@ -1,0 +1,4 @@
+{
+  "name": "Alpine",
+  "image": "alpine:latest"
+}

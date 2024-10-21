@@ -1,0 +1,4 @@
+{
+  "name": "CPP",
+  "image": "mcr.microsoft.com/devcontainers/cpp:latest"
+}

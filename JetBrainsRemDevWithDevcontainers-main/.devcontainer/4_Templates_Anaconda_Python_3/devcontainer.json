@@ -1,0 +1,4 @@
+{
+  "name": "Anaconda",
+  "image": "mcr.microsoft.com/devcontainers/anaconda:latest"
+}

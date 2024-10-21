@@ -1,0 +1,4 @@
+{
+  "name": "CPPMariaDB",
+  "image": "mcr.microsoft.com/devcontainers/cpp:latest"
+}

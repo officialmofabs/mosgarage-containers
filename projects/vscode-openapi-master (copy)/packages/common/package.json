@@ -1,0 +1,12 @@
+{
+  "name": "@xliic/common",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "build": "tsc --project tsconfig.esm.json && tsc --project tsconfig.cjs.json"
+  },
+  "devDependencies": {
+    "json-schema-to-typescript": "^11.0.3",
+    "@reduxjs/toolkit": "^2.1.1"
+  }
+}

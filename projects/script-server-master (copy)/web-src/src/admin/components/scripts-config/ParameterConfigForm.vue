@@ -1,0 +1,522 @@
+<template>
+  <form class="parameter-config-form col">
+    <div class="row">
+      <Textfield v-model="name" :config="nameField" class="col s4" @error="handleError(nameField, $event)"/>
+      <Checkbox v-model="required" :config="requiredField" class="col s3 offset-s1"
+                @error="handleError(requiredField, $event)"/>
+      <Combobox v-model="type" :config="typeField" :disabled="noValue || constant"
+                :dropdownContainer="this.$el"
+                class="col s4" @error="handleError(typeField, $event)"/>
+    </div>
+
+
+    <div class="row">
+      <Combobox v-model="passAs"
+                :config="passAsField"
+                class="col s3"/>
+
+      <Checkbox v-if="!noValue && (passAs === 'argument' || passAs === 'argument + env_variable')"
+                v-model="sameArgParam"
+                :config="sameArgParamField"
+                class="col s3" @error="handleError(sameArgParamField, $event)"/>
+
+      <Textfield
+          v-if="passAs === 'argument' || passAs === 'argument + env_variable'"
+          v-model="param" :config="paramField" class="col s3" @error="handleError(paramField, $event)"/>
+
+      <Textfield
+          v-if="passAs === 'env_variable' || passAs === 'argument + env_variable'"
+          v-model="envVar"
+          :config="envVarField"
+          class="col s3"
+          @error="handleError(envVarField, $event)"/>
+
+      <Textfield v-if="passAs === 'stdin'"
+                 v-model="stdinExpectedText"
+                 :config="stdinExpectedTextField"
+                 class="col s6"/>
+
+    </div>
+
+    <div class="row">
+      <Checkbox v-model="noValue" :config="noValueField" class="col s3"
+                @error="handleError(noValueField, $event)"/>
+      <Checkbox v-model="secure" :config="secureField" class="col s3"
+                @error="handleError(secureField, $event)"/>
+    </div>
+    <div v-if="selectedType !== 'file_upload' && !noValue" class="row">
+      <Textfield v-model="defaultValue" :class="{s6: !isExtendedDefault, s8: isExtendedDefault}"
+                 :config="defaultValueField" class="col"
+                 @error="handleError(defaultValueField, $event)"/>
+      <Checkbox v-model="constant" :config="constantField" class="col s3 offset-s1"
+                @error="handleError(constantField, $event)"/>
+    </div>
+    <div v-if="!constant" class="row">
+            <TextArea :config="descriptionField" @error="handleError(descriptionField, $event)" class="col s12"
+                      v-model="description"/>
+    </div>
+    <div v-if="selectedType === 'int'" class="row">
+      <Textfield v-model="min" :config="minField" class="col s5" @error="handleError(minField, $event)"/>
+      <Textfield v-model="max" :config="maxField" class="col s6 offset-s1"
+                 @error="handleError(maxField, $event)"/>
+    </div>
+    <div v-if="(selectedType === 'list' || selectedType === 'multiselect' || selectedType === 'editable_list')"
+         class="row">
+      <Textfield v-if="allowedValuesFromScript" v-model="allowedValuesScript"
+                 :config="allowedValuesScriptField"
+                 class="col s8" @error="handleError(allowedValuesScriptField, $event)"/>
+      <ChipsList v-else v-model="allowedValues" class="col s8" title="Allowed values"
+                 @error="handleError('Allowed values', $event)"/>
+      <Checkbox v-model="allowedValuesFromScript" :config="allowedValuesFromScriptField"
+                class="col s2"
+                @error="handleError(allowedValuesFromScriptField, $event)"/>
+      <Checkbox v-if="allowedValuesFromScript" v-model="allowedValuesScriptShellEnabled"
+                :config="allowedValuesScriptShellEnabledField"
+                class="col s2"
+                @error="handleError(allowedValuesScriptShellEnabledField, $event)"/>
+    </div>
+    <div v-if="(selectedType === 'multiselect')" class="row">
+      <Combobox v-model="multiselectArgumentType" :config="multiselectArgumentTypeField"
+                class="col s4" @error="handleError(multiselectArgumentTypeField, $event)"/>
+
+      <Textfield v-if="!multiselectArgumentType || multiselectArgumentType ==='single_argument'" v-model="separator"
+                 :config="separatorField" class="col s2 offset-s1"
+                 @error="handleError(separatorField, $event)"/>
+    </div>
+    <div v-if="(selectedType === 'server_file')" class="row">
+      <Textfield v-model="fileDir" :config="fileDirField" class="col s5"
+                 @error="handleError(fileDirField, $event)"/>
+      <Checkbox v-model="recursive" :config="recursiveField" class="col s2 offset-s1"
+                @error="handleError(recursiveField, $event)"/>
+      <Combobox v-model="fileType" :config="fileTypeField" class="col s3 offset-s1"
+                @error="handleError(fileTypeField, $event)"/>
+      <ChipsList v-model="fileExtensions" class="col s12"
+                 title="Allowed file extensions"
+                 @error="handleError('Allowed file extensions', $event)"/>
+      <ChipsList v-model="excludedFiles" class="col s12"
+                 title="Excluded files"
+                 @error="handleError('Excluded files', $event)"/>
+    </div>
+    <div v-if="selectedType === 'text' || selectedType === undefined || selectedType === 'multiline_text'" class="row">
+      <Textfield v-model="regexConfigPattern" :config="regexPatternField" class="col s4"
+                 @error="handleError(regexPatternField, $event)"/>
+      <Textfield v-model="regexConfigDescription" :config="regexDescriptionField" class="col s4"
+                 @error="handleError(regexDescriptionField, $event)"/>
+      <Textfield v-model="max_length" :config="maxLengthField" class="col s4"
+                 @error="handleError(maxLengthField, $event)"/>
+    </div>
+
+    <div v-if="selectedType !== 'multiline_text'" class="row">
+      <Textfield v-model="uiWidthWeight"
+                 :config="uiWidthWeightField"
+                 class="col s2"
+                 @error="handleError(uiWidthWeightField, $event)"/>
+    </div>
+
+    <div class="row">
+      <Combobox v-model="uiSeparatorType"
+                :config="uiSeparatorTypeField"
+                class="col s2"
+                @error="handleError(uiSeparatorTypeField, $event)"/>
+      <Textfield v-model="uiSeparatorTitle"
+                 :config="uiSeparatorTitleField"
+                 class="col s4"
+                 @error="handleError(uiSeparatorTitleField, $event)"/>
+
+    </div>
+
+    <div v-if="type === 'list' || type === 'multiselect'" class="row">
+      <ParameterSeparator :separator="{'type': 'line', 'title': 'Values UI Mapping'}" class="col s12"/>
+      <ParameterValuesUiMapping v-model="valuesUiMapping" class="col s12"/>
+    </div>
+  </form>
+</template>
+
+<script>
+import ParameterValuesUiMapping from '@/admin/components/scripts-config/ParameterValuesUiMapping.vue';
+import Checkbox from '@/common/components/checkbox';
+import ChipsList from '@/common/components/ChipsList';
+import Combobox from '@/common/components/combobox';
+import TextArea from '@/common/components/TextArea';
+import Textfield from '@/common/components/textfield';
+import {forEachKeyValue, isBlankString, isEmptyArray, isEmptyObject, isEmptyString} from '@/common/utils/common';
+import ParameterSeparator from '@/main-app/components/scripts/ParameterSeparator.vue';
+import get from 'lodash/get';
+import Vue from 'vue';
+import {
+  allowedValuesFromScriptField,
+  allowedValuesScriptField,
+  allowedValuesScriptShellEnabledField,
+  constantField,
+  defaultValueField,
+  descriptionField,
+  envVarField,
+  fileDirField,
+  fileTypeField,
+  maxField,
+  maxLengthField,
+  minField,
+  multiselectArgumentTypeField,
+  nameField,
+  noValueField,
+  paramField,
+  passAsField,
+  recursiveField,
+  regexDescriptionField,
+  regexPatternField,
+  requiredField,
+  sameArgParamField,
+  secureField,
+  separatorField,
+  stdinExpectedTextField,
+  typeField,
+  uiSeparatorTitleField,
+  uiSeparatorTypeField,
+  uiWidthWeightField
+} from './parameter-fields';
+
+function updateValue(value, configField, newValue) {
+  if (!value.hasOwnProperty(configField)) {
+    Object.assign(value, {[configField]: newValue});
+  }
+  Vue.set(value, configField, newValue);
+}
+
+export default {
+  name: 'ParameterConfigForm',
+  components: {ParameterValuesUiMapping, ParameterSeparator, ChipsList, TextArea, Checkbox, Combobox, Textfield},
+  props: {
+    value: {
+      type: Object,
+      default: null
+    }
+  },
+
+  mounted: function () {
+    const simpleFields = {
+      name: 'name',
+      description: 'description',
+      param: 'param',
+      sameArgParam: 'same_arg_param',
+      envVar: 'env_var',
+      type: 'type',
+      noValue: 'no_value',
+      required: 'required',
+      constant: 'constant',
+      secure: 'secure',
+      min: 'min',
+      max: 'max',
+      max_length: 'max_length',
+      multiselectArgumentType: 'multiselect_argument_type',
+      separator: 'separator',
+      fileDir: 'file_dir',
+      recursive: 'file_recursive',
+      fileType: 'file_type',
+      stdinExpectedText: 'stdin_expected_text',
+      valuesUiMapping: 'values_ui_mapping'
+    };
+
+    forEachKeyValue(simpleFields, (vmField, configField) => {
+      this.$watch(vmField, (newValue) => updateValue(this.value, configField, newValue));
+    });
+  },
+
+  data() {
+    return {
+      name: null,
+      param: null,
+      sameArgParam: null,
+      envVar: null,
+      passAs: null,
+      stdinExpectedText: null,
+      type: null,
+      noValue: null,
+      required: null,
+      description: null,
+      min: null,
+      max: null,
+      max_length: null,
+      regexConfigPattern: null,
+      regexConfigDescription: null,
+      allowedValues: null,
+      allowedValuesScript: null,
+      allowedValuesFromScript: null,
+      allowedValuesScriptShellEnabled: null,
+      valuesUiMapping: null,
+      defaultValue: null,
+      constant: null,
+      secure: null,
+      separator: null,
+      multiselectArgumentType: null,
+      fileDir: null,
+      recursive: null,
+      fileType: null,
+      fileExtensions: null,
+      excludedFiles: null,
+      uiWidthWeight: null,
+      uiSeparatorType: null,
+      uiSeparatorTitle: null,
+      nameField,
+      paramField: Object.assign({}, paramField),
+      passAsField,
+      stdinExpectedTextField,
+      envVarField,
+      typeField,
+      noValueField,
+      requiredField,
+      secureField,
+      descriptionField,
+      minField,
+      maxField: Object.assign({}, maxField),
+      maxLengthField,
+      regexPatternField,
+      regexDescriptionField,
+      allowedValuesScriptField,
+      allowedValuesFromScriptField,
+      defaultValueField: Object.assign({}, defaultValueField),
+      constantField,
+      sameArgParamField,
+      multiselectArgumentTypeField,
+      separatorField,
+      fileDirField,
+      recursiveField,
+      fileTypeField,
+      allowedValuesScriptShellEnabledField: allowedValuesScriptShellEnabledField,
+      uiWidthWeightField,
+      uiSeparatorTypeField,
+      uiSeparatorTitleField
+    }
+  },
+
+  watch: {
+    value: {
+      immediate: true,
+      handler(config) {
+        if (config) {
+          this.name = config['name'];
+          this.description = config['description'];
+          this.param = config['param'];
+          this.envVar = config['env_var'];
+          this.type = config['type'];
+          this.noValue = get(config, 'no_value', false);
+          this.required = get(config, 'required', false);
+          this.min = config['min'];
+          this.max = config['max'];
+          this.max_length = config['max_length'];
+          this.regexConfigPattern = get(config, 'regex.pattern', '');
+          this.regexConfigDescription = get(config, 'regex.description', '');
+          this.constant = !!get(config, 'constant', false);
+          this.secure = !!get(config, 'secure', false);
+          this.multiselectArgumentType = get(config, 'multiselect_argument_type', 'single_argument');
+          this.sameArgParam = !!get(config, 'same_arg_param', false);
+          this.separator = get(config, 'separator', ',');
+          this.fileDir = config['file_dir'];
+          this.recursive = !!get(config, 'file_recursive', false);
+          this.fileType = get(config, 'file_type', 'any');
+          this.fileExtensions = get(config, 'file_extensions', []);
+          this.excludedFiles = get(config, 'excluded_files', []);
+          this.stdinExpectedText = get(config, 'stdin_expected_text')
+          this.passAs = get(config, 'pass_as', 'argument + env_variable')
+          this.valuesUiMapping = get(config, 'values_ui_mapping', {})
+
+          this.uiWidthWeight = config['ui']?.['width_weight']
+          this.uiSeparatorType = config['ui']?.['separator_before']?.['type']
+          this.uiSeparatorTitle = config['ui']?.['separator_before']?.['title']
+
+          const defaultValue = get(config, 'default', '');
+          if (this.isRecursiveFile()) {
+            if (Array.isArray(defaultValue)) {
+              this.defaultValue = defaultValue.join('/');
+              if (this.defaultValue.startsWith('//')) {
+                this.defaultValue = this.defaultValue.substring(1);
+              }
+
+            } else {
+              this.defaultValue = defaultValue;
+            }
+          } else {
+            this.defaultValue = defaultValue.toString();
+          }
+
+          const allowedValues = get(config, 'values', []);
+          if (Array.isArray(allowedValues) || !allowedValues['script']) {
+            this.allowedValues = allowedValues;
+            this.allowedValuesFromScript = false;
+            this.allowedValuesScript = '';
+            this.allowedValuesScriptShellEnabled = false
+          } else {
+            this.allowedValues = [];
+            this.allowedValuesFromScript = true;
+            this.allowedValuesScript = allowedValues['script'];
+            this.allowedValuesScriptShellEnabled = get(allowedValues, 'shell', false);
+          }
+        }
+      }
+    },
+    noValue: {
+      immediate: true,
+      handler(noValue) {
+        Vue.set(this.paramField, 'required', noValue);
+      }
+    },
+    constant: {
+      immediate: true,
+      handler(constant) {
+        Vue.set(this.defaultValueField, 'required', constant);
+        Vue.set(this.defaultValueField, 'name', constant ? 'Constant value' : defaultValueField.name);
+      }
+    },
+    min: {
+      handler(min) {
+        Vue.set(this.maxField, 'min', min);
+      }
+    },
+    fileExtensions(fileExtensions) {
+      if (isEmptyArray(fileExtensions)) {
+        this.$delete(this.value, 'file_extensions');
+      } else {
+        updateValue(this.value, 'file_extensions', fileExtensions);
+      }
+    },
+    excludedFiles(excludedFiles) {
+      if (isEmptyArray(excludedFiles)) {
+        this.$delete(this.value, 'excluded_files');
+      } else {
+        updateValue(this.value, 'excluded_files', excludedFiles);
+      }
+    },
+    allowedValuesFromScript() {
+      this.updateAllowedValues();
+    },
+    allowedValues() {
+      this.updateAllowedValues();
+    },
+    allowedValuesScript() {
+      this.updateAllowedValues();
+    },
+    allowedValuesScriptShellEnabled() {
+      this.updateAllowedValues();
+    },
+    regexConfigPattern() {
+      this.updateRegexConfig();
+    },
+    regexConfigDescription() {
+      this.updateRegexConfig();
+    },
+    defaultValue() {
+      if (this.selectedType === 'multiselect') {
+        updateValue(this.value, 'default', this.defaultValue.split(',').filter(s => !isEmptyString(s)));
+      } else if (this.isRecursiveFile()) {
+        let path = this.defaultValue.split('/').filter(s => !isEmptyString(s));
+        if (this.defaultValue.startsWith('/')) {
+          path = ['/', ...path];
+        }
+        updateValue(this.value, 'default', path);
+      } else {
+        updateValue(this.value, 'default', this.defaultValue);
+      }
+    },
+    uiWidthWeight() {
+      this.updateUiFields()
+    },
+    uiSeparatorType() {
+      this.updateUiFields()
+    },
+    uiSeparatorTitle() {
+      this.updateUiFields()
+    },
+    passAs() {
+      if (this.passAs === 'argument + env_variable') {
+        this.$delete(this.value, 'pass_as');
+      } else {
+        updateValue(this.value, 'pass_as', this.passAs);
+      }
+    }
+  },
+
+  computed: {
+    selectedType() {
+      if (this.noValue || this.constant) {
+        return null;
+      }
+
+      return this.type;
+    },
+    isExtendedDefault() {
+      return (this.selectedType === 'multiselect') || (this.isRecursiveFile());
+    }
+  },
+
+
+  methods: {
+    updateRegexConfig() {
+      updateValue(this.value, 'regex', {
+        pattern: this.regexConfigPattern,
+        description: this.regexConfigDescription
+      });
+    },
+    updateAllowedValues() {
+      if (this.allowedValuesFromScript) {
+        updateValue(this.value, 'values', {
+          script: this.allowedValuesScript,
+          shell: this.allowedValuesScriptShellEnabled
+        });
+      } else {
+        updateValue(this.value, 'values', this.allowedValues);
+      }
+    },
+    isRecursiveFile() {
+      return (this.selectedType === 'server_file') && (this.recursive);
+    },
+    updateUiFields() {
+      const newUiConfig = {}
+
+      if (this.uiWidthWeight) {
+        newUiConfig['width_weight'] = parseInt(this.uiWidthWeight)
+      }
+
+      const separatorType = !isEmptyString(this.uiSeparatorType) && (this.uiSeparatorType !== 'none')
+          ? this.uiSeparatorType
+          : null;
+      const separatorTitle = !isBlankString(this.uiSeparatorTitle)
+          ? this.uiSeparatorTitle
+          : null;
+
+      if (separatorType || separatorTitle) {
+        newUiConfig['separator_before'] = {}
+        if (separatorType) {
+          newUiConfig['separator_before']['type'] = separatorType
+        }
+        if (separatorTitle) {
+          newUiConfig['separator_before']['title'] = separatorTitle
+        }
+      }
+
+      if (!isEmptyObject(newUiConfig)) {
+        updateValue(this.value, 'ui', newUiConfig);
+      } else {
+        this.$delete(this.value, 'ui');
+      }
+    },
+    handleError(fieldConfig, error) {
+      let fieldName;
+      if (fieldConfig instanceof String) {
+        fieldName = fieldConfig;
+      } else {
+        fieldName = fieldConfig.name;
+      }
+      this.$emit('error', {fieldName, message: error});
+    }
+  }
+}
+</script>
+
+<style scoped>
+.parameter-config-form >>> .col.checkbox {
+  margin-top: 2.1em;
+}
+
+.parameter-config-form >>> .row {
+  margin-bottom: 0;
+}
+</style>

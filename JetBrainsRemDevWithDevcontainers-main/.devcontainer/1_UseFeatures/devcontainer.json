@@ -1,0 +1,7 @@
+{
+  "name": "Go Development Container",
+  "image": "openjdk:11",
+  "features": {
+    "ghcr.io/devcontainers/features/go:1": {}
+  }
+}

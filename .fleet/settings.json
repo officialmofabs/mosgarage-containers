@@ -1,0 +1,37 @@
+{
+    "plugins": [
+        {
+            "type": "add",
+            "pluginName": "gradle.daemon.services"
+        },
+        {
+            "type": "add",
+            "pluginName": "fleet.javascript.ai"
+        },
+        {
+            "type": "add",
+            "pluginName": "fleet.dotnet"
+        },
+        {
+            "type": "add",
+            "pluginName": "fleet.docker"
+        },
+        {
+            "type": "add",
+            "pluginName": "fleet.go"
+        },
+        {
+            "type": "add",
+            "pluginName": "fleet.maven"
+        },
+        {
+            "type": "add",
+            "pluginName": "fleet.svelte"
+        },
+        {
+            "type": "add",
+            "pluginName": "fleet.zip"
+        }
+    ],
+    "files.exclude": [".DS_Store", ".git"]
+}

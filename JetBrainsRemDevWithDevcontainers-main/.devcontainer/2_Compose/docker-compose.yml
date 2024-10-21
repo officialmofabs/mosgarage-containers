@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:4.2.16
+    restart: always
+    networks:
+      - backend
+  devcontainer:
+    image: golang:latest
+    depends_on:
+      - mongodb
+    networks:
+      - backend
+    ports:
+      - "27001:27001"
+networks:
+  backend:
+    driver: bridge
