@@ -1,0 +1,27 @@
+services:
+  pomerium:
+    image: pomerium/pomerium:v0.27.1
+    ports:
+      - 443:443
+    restart: always
+    environment:
+      POMERIUM_ZERO_TOKEN: AMf-vBwCSBqKIzqFRBMfu9MBKCzGkyEqRoN0QXCz3ldnee6dLcC-qT7GyWTN7rFfe_uwqfz8UkdWqn-hdn5d8oYw3TYqho3Tx0C6KNFDGQ9AwWw7ZaPu0XHuP0MiL8J_aaFKYl0OdeQtNljnUBZFvNN3VZ2X6V-Ppv4TwYrhMJb7D2hSbVBxzmLTFH5zBJqEu5qvait9UKsf
+      XDG_CACHE_HOME: /var/cache
+    volumes:
+      - pomerium-cache:/var/cache
+    networks:
+      main:
+        aliases:
+        - verify.integral-ape-4028.pomerium.app
+  verify:
+    image: cr.pomerium.com/pomerium/verify:latest
+    networks:
+      main:
+        aliases:
+        - verify
+
+networks:
+  main: {}
+
+volumes:
+  pomerium-cache:
