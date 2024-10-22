@@ -1,0 +1,40 @@
+name: guacamole
+services:
+  guacamole:
+    container_name: guacamole
+    environment:
+      - GUID=1000
+      - PUID=1000
+      - TZ=Europe/Madrid
+    image: flcontainers/guacamole
+    labels:
+      icon: https://icon.casaos.io/main/all/guacamole.png
+    ports:
+      - target: 8080
+        published: "8200"
+        protocol: tcp
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: /DATA/AppData//config
+        target: /config
+      - type: bind
+        source: /etc/localtime
+        target: /etc/localtime
+    networks:
+      - guacamole
+    privileged: false
+networks:
+  guacamole:
+    name: guacamole
+x-casaos:
+  author: Labarta
+  category: Utilities
+  hostname: ""
+  icon: https://icon.casaos.io/main/all/guacamole.png
+  index: /
+  port_map: "8200"
+  scheme: http
+  store_app_id: guacamole
+  title:
+    custom: Guacamole
